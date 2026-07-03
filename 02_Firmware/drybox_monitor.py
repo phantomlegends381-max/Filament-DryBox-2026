@@ -1,52 +1,47 @@
+import machine
 import time
-import board
-import busio
-from PIL import Image, ImageDraw, ImageFont
-import adafruit_ssd1306
-import adafruit_dht
+import dht
+import ssd1306
 
 # Setup I2C communications for the OLED screen (Pins: SDA/SCL)
-i2c = busio.I2C(board.SCL, board.SDA)
-oled = adafruit_ssd1306.SSD1306_I2C(128, 64, i2c)
-
+i2c = machine.I2C(0, sda=machine.Pin(4), scl=machine.Pin(5), freq=400000)
+oled = ssd1306.SSD1306_I2C(128, 64, i2c)
 # Setup the DHT22 Temperature/Humidity Sensor
-dhtDevice = adafruit_dht.DHT22(board.D4)
-
-#clear OLED memory
-oled.fill(0)
-oled.show()
-
-# blank canvas dispaly for drawing elements
-mage = Image.new("1", (oled.width, oled.height))
-draw = ImageDraw.Draw(image)
-font = ImageFont.load_default()
-print("Drybox monitor script running in VS Code. Press Ctrl+C in the terminal to exit.")
+sensor = dht.DHT11(machine.Pin(15))
+print("Pico Drybox Monitor Active. Press Ctrl+C in your IDE to stop.")
 
 while True:
     try:
-        temperature_c = dhtDevice.temperature
-        humidity = dhtDevice.humidity
-        temperature_f = (temperature_c * 9/5) + 32
-        if humidity < 20:
-            status = "STATUS: DRY/PERFECT"
-        elif humidity < 35:
-            status = "STATUS: SAFE/OK"
-        else:
-            status = "STATUS: WET/ATTN!"
-    
-        draw.rectangle((0, 0, oled.width, oled.height), fill=0)
-        draw.text((0, 0),  "INLAND STORAGE", font=font, fill=255)
-        draw.text((0, 18), f"Humidity: {humidity:.1f}%", font=font, fill=255)
-        draw.text((0, 32), f"Temp: {temperature_f:.1f} F", font=font, fill=255)
-        draw.text((0, 50), status, font=font, fill=255)
-    oled.image(image)
-    oled.show()
-    except RuntimeError as error:
-        print(f"Sensor communication lag: {error.args[0]}")
-        time.sleep(2.0)
-        continue
+        # Trigger sensor reading
+        sensor.measure()
+        humidity = sensor.humidity()
+        temp_c = sensor.temperature()
         
-    except Exception as e:
-        dht_sensor.exit()
-        raise e
+        # Convert Celsius to Fahrenheit
+        temp_f = (temp_c * 9/5) + 32
+        
+        # Determine environmental safety status
+        if humidity < 20:
+            status = "DRY / PERFECT"
+        elif humidity < 35:
+            status = "SAFE / OK"
+        else:
+            status = "WET / ATTN!"
+            
+        # Clear the OLED screen buffer
+        oled.fill(0)
+        
+        # Write text to the display buffer (X, Y coordinates)
+        oled.text("INLAND STORAGE", 0, 0)
+        oled.text(f"Humidity: {humidity}%", 0, 18)
+        oled.text(f"Temp: {temp_f:.1f} F", 0, 34)
+        oled.text(status, 0, 52)
+        
+        # Push buffer changes live to the physical screen
+        oled.show()
+        
+    except OSError as e:
+        print("Sensor read error, trying again...", e)
+        
+    # Polling interval pause
     time.sleep(2.0)
