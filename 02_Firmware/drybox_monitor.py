@@ -34,8 +34,8 @@ while True:
         else:
             status = "STATUS: WET/ATTN!"
     
-    draw.rectangle((0, 0, oled.width, oled.height), fill=0)
-    draw.text((0, 0),  "INLAND STORAGE", font=font, fill=255)
+        draw.rectangle((0, 0, oled.width, oled.height), fill=0)
+        draw.text((0, 0),  "INLAND STORAGE", font=font, fill=255)
         draw.text((0, 18), f"Humidity: {humidity:.1f}%", font=font, fill=255)
         draw.text((0, 32), f"Temp: {temperature_f:.1f} F", font=font, fill=255)
         draw.text((0, 50), status, font=font, fill=255)
