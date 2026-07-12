@@ -8,6 +8,8 @@ SO basically it uses a DHT11 HUMIDITY SENSOR , OLED o 96 SCREEN and Raspberry PI
 PROJECT IMAGES BUILD
 <img width="3000" height="4000" alt="22425" src="https://github.com/user-attachments/assets/8721fe8c-a386-4512-ace6-cb6d189dbf04" />
 <img width="616" height="821" alt="image" src="https://github.com/user-attachments/assets/84f4ae32-ad9d-4a27-909f-787df8e59fc3" />
+<img width="4032" height="3024" alt="IMG_8475" src="https://github.com/user-attachments/assets/bec8c77f-fbb0-4650-85de-8fe54c843bab" />
+
 
 INSTRUCTION
 USE Thonny IDE since the code is written in MICROPYTHON
