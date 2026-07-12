@@ -10,9 +10,15 @@ oled = ssd1306.SSD1306_I2C(128, 64, i2c)
 # DHT11 Sensor configuration
 sensor = dht.DHT11(machine.Pin(15))
 
-# Case Fan configuration on GPIO 11
-fan = machine.Pin(11, machine.Pin.OUT)
+# Case Fan configuration on GPIO 14
+fan = machine.Pin(14, machine.Pin.OUT)
 fan.value(0) # Initialize fan to off
+
+# LED configurations (Red on GPIO 18, Yellow on GPIO 20)
+led_red = machine.Pin(18, machine.Pin.OUT)
+led_yellow = machine.Pin(20, machine.Pin.OUT)
+led_red.value(0)
+led_yellow.value(1) # Fan is initially off, so yellow is ON
 
 while True:
     try:
@@ -21,18 +27,23 @@ while True:
         temp_c = sensor.temperature()
         temp_f = (temp_c * 9/5) + 32
         
-        # Turn fan ON if humidity gets too high (>20%), OFF once it drops (<=15%)
-        if humidity > 20:
-            fan.value(1)
-        elif humidity <= 15:
-            fan.value(0)
+        # Turn fan ON if temp gets too high (>30C), OFF once it drops to the lower end (<=10C)
             
-        if humidity < 20:
+        if humidity <= 46:
             status = "DRY / PERFECT"
-        elif humidity < 35:
+            fan.value(0)
+            led_red.value(0)
+            led_yellow.value(1)  # Yellow LED ON when fan is off
+        elif humidity < 40:
             status = "SAFE / OK"
-        else:
+            fan.value(0)
+            led_red.value(0)
+            led_yellow.value(1)  # Yellow LED ON when fan is off
+        elif humidity > 46:
             status = "WET / ATTN!"
+            fan.value(1)
+            led_red.value(1)     # Red LED ON when fan is running
+            led_yellow.value(0)
             
         oled.fill(0)
         oled.text("INLAND STORAGE", 0, 0)
