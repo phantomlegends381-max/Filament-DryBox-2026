@@ -10,6 +10,10 @@ oled = ssd1306.SSD1306_I2C(128, 64, i2c)
 # DHT11 Sensor configuration
 sensor = dht.DHT11(machine.Pin(15))
 
+# Case Fan configuration on GPIO 11
+fan = machine.Pin(11, machine.Pin.OUT)
+fan.value(0) # Initialize fan to off
+
 while True:
     try:
         sensor.measure()
@@ -17,6 +21,12 @@ while True:
         temp_c = sensor.temperature()
         temp_f = (temp_c * 9/5) + 32
         
+        # Turn fan ON if humidity gets too high (>20%), OFF once it drops (<=15%)
+        if humidity > 20:
+            fan.value(1)
+        elif humidity <= 15:
+            fan.value(0)
+            
         if humidity < 20:
             status = "DRY / PERFECT"
         elif humidity < 35:
