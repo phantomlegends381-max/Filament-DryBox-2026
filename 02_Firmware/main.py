@@ -44,7 +44,7 @@ while True:
             fan.value(1)
             led_red.value(1)     # Red LED ON when fan is running
             led_yellow.value(0)
-            
+        
         oled.fill(0)
         oled.text("INLAND STORAGE", 0, 0)
         oled.text(f"Humidity: {humidity}%", 0, 18)
